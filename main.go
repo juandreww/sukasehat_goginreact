@@ -26,4 +26,26 @@ func main() {
 
 	// Start and run the server
 	router.Run(":3000")
+
+	// Our API will consit of just two routes
+	// /jokes - which will retrieve a list of jokes a user can see
+	// /jokes/like/:jokeID - which will capture likes sent to a particular joke
+	api.GET("/jokes", JokeHandler)
+	api.POST("/jokes/like/:jokeID", LikeJoke)
+}
+
+// JokeHandler retrieves a list of available jokes
+func JokeHandler(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Jokes handler not implemented yet",
+	})
+}
+
+// LikeJoke increments the likes of a particular joke Item
+func LikeJoke(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "LikeJoke handler not implemented yet",
+	})
 }
