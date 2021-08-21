@@ -27,6 +27,3 @@ func main() {
 	// Start and run the server
 	router.Run(":3000")
 }
-
-/* This function is to provide access for user to do this to that
- */
