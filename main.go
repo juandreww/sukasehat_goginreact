@@ -42,7 +42,6 @@ func main() {
 			})
 		})
 	}
-
 	// Our API will consit of just two routes
 	// /jokes - which will retrieve a list of jokes a user can see
 	// /jokes/like/:jokeID - which will capture likes sent to a particular joke
@@ -69,6 +68,7 @@ func LikeJoke(c *gin.Context) {
 				jokes[i].Likes += 1
 			}
 		}
+
 		// return a pointer to the updated jokes list
 		c.JSON(http.StatusOK, &jokes)
 	} else {
