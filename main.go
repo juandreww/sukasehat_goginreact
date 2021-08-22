@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,6 +26,9 @@ var jokes = []Joke{
 	Joke{6, 0, "Why did the coffee file a police report? It got mugged."},
 	Joke{7, 0, "How does a penguin build it's house? Igloos it together."},
 }
+
+func trace(s string)   { fmt.Println("entering:", s) }
+func untrace(s string) { fmt.Println("leaving:", s) }
 
 func main() {
 	// Set the router as the default one shipped with Gin
@@ -54,6 +58,8 @@ func main() {
 
 func JokeHandler(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
+	trace("a")
+	defer untrace("a")
 	c.JSON(http.StatusOK, jokes)
 }
 
@@ -68,7 +74,6 @@ func LikeJoke(c *gin.Context) {
 				jokes[i].Likes += 1
 			}
 		}
-
 		// return a pointer to the updated jokes list
 		c.JSON(http.StatusOK, &jokes)
 	} else {
