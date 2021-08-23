@@ -32,7 +32,7 @@ class LoggedIn extends React.Component {
     }
       
 render() {
-    return (
+  return (
     <div className="container">
         <div className="col-lg-12">
         <br />
@@ -47,5 +47,7 @@ render() {
         </div>
     </div>
     )
+  }
 }
-}
+
+ReactDOM.render(<App />, document.getElementById('app'));
