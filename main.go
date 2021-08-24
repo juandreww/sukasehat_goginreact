@@ -25,6 +25,7 @@ var jokes = []Joke{
 	Joke{5, 0, "I just watched a program about beavers. It was the best dam program I've ever seen."},
 	Joke{6, 0, "Why did the coffee file a police report? It got mugged."},
 	Joke{7, 0, "How does a penguin build it's house? Igloos it together."},
+	Joke{8, 0, "Just adding more."},
 }
 
 func trace(s string)   { fmt.Println("entering:", s) }
