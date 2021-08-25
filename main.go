@@ -34,7 +34,7 @@ func untrace(s string) { fmt.Println("leaving:", s) }
 func main() {
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
-
+	//
 	// Serve frontend static files
 	router.Use(static.Serve("/", static.LocalFile("./views", true)))
 
