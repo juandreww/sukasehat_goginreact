@@ -1,8 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/contrib/static"
@@ -31,7 +34,36 @@ var jokes = []Joke{
 func trace(s string)   { fmt.Println("entering:", s) }
 func untrace(s string) { fmt.Println("leaving:", s) }
 
+var jwtMiddleWare *jwtmiddleware.JWTMiddleware
+
 func main() {
+	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
+		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+			aud := os.Getenv("AUTH0_API_AUDIENCE")
+			checkAudience := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
+			if !checkAudience {
+				return token, errors.New("Invalid audience.")
+			}
+			// verify iss claim
+			iss := os.Getenv("AUTH0_DOMAIN")
+			checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
+			if !checkIss {
+				return token, errors.New("Invalid issuer.")
+			}
+
+			cert, err := getPemCert(token)
+			if err != nil {
+				log.Fatalf("could not get cert: %+v", err)
+			}
+
+			result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
+			return result, nil
+		},
+		SigningMethod: jwt.SigningMethodRS256,
+	})
+
+	// register our actual jwtMiddleware
+	jwtMiddleWare = jwtMiddleware
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
 	//
@@ -56,6 +88,21 @@ func main() {
 
 	// Start and run the server
 	router.Run(":3000")
+}
+
+func authMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get the client secret key
+		err := jwtMiddleWare.CheckJWT(c.Writer, c.Request)
+		if err != nil {
+			// Token not found
+			fmt.Println(err)
+			c.Abort()
+			c.Writer.WriteHeader(http.StatusUnauthorized)
+			c.Writer.Write([]byte("Unauthorized"))
+			return
+		}
+	}
 }
 
 func JokeHandler(c *gin.Context) {
