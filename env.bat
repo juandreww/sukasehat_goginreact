@@ -1,4 +1,4 @@
-set AUTH0_API_CLIENT_SECRET="_fu3v1rmvaF8j0VK3UEPn7xvVcO7G1tMDMh70Ryt9ILPNGOQUnziVJfjSgymh8ms"
-set AUTH0_CLIENT_ID="olp0CzVY6mMGY0UWB6Ibwvv5vE8WSAQm"
-set AUTH0_DOMAIN="dev-puaom9z0.us.auth0.com"
-set AUTH0_API_AUDIENCE= "golang-gin"
+set AUTH0_API_CLIENT_SECRET = "_fu3v1rmvaF8j0VK3UEPn7xvVcO7G1tMDMh70Ryt9ILPNGOQUnziVJfjSgymh8ms"
+set AUTH0_CLIENT_ID = "olp0CzVY6mMGY0UWB6Ibwvv5vE8WSAQm"
+set AUTH0_DOMAIN = "dev-puaom9z0.us.auth0.com"
+set AUTH0_API_AUDIENCE = "golang-gin"
