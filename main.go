@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/form3tech-oss/jwt-go"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,6 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-// Jwks stores a slice of JSON Web Keys
 type Jwks struct {
 	Keys []JSONWebKeys `json:"keys"`
 }
@@ -33,14 +32,13 @@ type JSONWebKeys struct {
 	X5c []string `json:"x5c"`
 }
 
-// Joke contains information about a single Joke
 type Joke struct {
 	ID    int    `json:"id" binding:"required"`
 	Likes int    `json:"likes"`
 	Joke  string `json:"joke" binding:"required"`
 }
 
-// We'll create a list of jokes
+/** we'll create a list of jokes */
 var jokes = []Joke{
 	Joke{1, 0, "Did you hear about the restaurant on the moon? Great food, no atmosphere."},
 	Joke{2, 0, "What do you call a fake noodle? An Impasta."},
