@@ -19,6 +19,20 @@ type Response struct {
 	Message string `json:"message"`
 }
 
+// Jwks stores a slice of JSON Web Keys
+type Jwks struct {
+	Keys []JSONWebKeys `json:"keys"`
+}
+
+type JSONWebKeys struct {
+	Kty string   `json:"kty"`
+	Kid string   `json:"kid"`
+	Use string   `json:"use"`
+	N   string   `json:"n"`
+	E   string   `json:"e"`
+	X5c []string `json:"x5c"`
+}
+
 // Joke contains information about a single Joke
 type Joke struct {
 	ID    int    `json:"id" binding:"required"`
@@ -35,24 +49,6 @@ var jokes = []Joke{
 	Joke{5, 0, "I just watched a program about beavers. It was the best dam program I've ever seen."},
 	Joke{6, 0, "Why did the coffee file a police report? It got mugged."},
 	Joke{7, 0, "How does a penguin build it's house? Igloos it together."},
-	Joke{8, 0, "Just adding more."},
-}
-
-func trace(s string)   { fmt.Println("entering:", s) }
-func untrace(s string) { fmt.Println("leaving:", s) }
-
-// Jwks stores a slice of JSON Web Keys
-type Jwks struct {
-	Keys []JSONWebKeys `json:"keys"`
-}
-
-type JSONWebKeys struct {
-	Kty string   `json:"kty"`
-	Kid string   `json:"kid"`
-	Use string   `json:"use"`
-	N   string   `json:"n"`
-	E   string   `json:"e"`
-	X5c []string `json:"x5c"`
 }
 
 var jwtMiddleWare *jwtmiddleware.JWTMiddleware
@@ -83,15 +79,13 @@ func main() {
 		SigningMethod: jwt.SigningMethodRS256,
 	})
 
-	// register our actual jwtMiddleware
 	jwtMiddleWare = jwtMiddleware
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
-	//
-	// Serve frontend static files
+
+	// Serve the frontend
 	router.Use(static.Serve("/", static.LocalFile("./views", true)))
 
-	// Setup route group for the API
 	api := router.Group("/api")
 	{
 		api.GET("/", func(c *gin.Context) {
@@ -99,15 +93,10 @@ func main() {
 				"message": "pong",
 			})
 		})
+		api.GET("/jokes", authMiddleware(), JokeHandler)
+		api.POST("/jokes/like/:jokeID", authMiddleware(), LikeJoke)
 	}
-	////
-	// Our API will consit of just two routes
-	// /jokes - which will retrieve a list of jokes a user can see
-	// /jokes/like/:jokeID - which will capture likes sent to a particular joke
-	api.GET("/jokes", authMiddleware(), JokeHandler)
-	api.POST("/jokes/like/:jokeID", authMiddleware(), LikeJoke)
-
-	// Start and run the server
+	// Start the app
 	router.Run(":3000")
 }
 
@@ -134,12 +123,13 @@ func getPemCert(token *jwt.Token) (string, error) {
 	}
 
 	if cert == "" {
-		return cert, errors.New("unable to find appropriate key.")
+		return cert, errors.New("unable to find appropriate key")
 	}
 
 	return cert, nil
 }
 
+// authMiddleware intercepts the requests, and check for a valid jwt token
 func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get the client secret key
@@ -155,28 +145,25 @@ func authMiddleware() gin.HandlerFunc {
 	}
 }
 
+// JokeHandler returns a list of jokes available (in memory)
 func JokeHandler(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	trace("a")
-	defer untrace("a")
+
 	c.JSON(http.StatusOK, jokes)
 }
 
-// LikeJoke increments the likes of a particular joke Item
 func LikeJoke(c *gin.Context) {
-	// confirm Joke ID sent is valid
-	// remember to import the `strconv` package
+	// Check joke ID is valid
 	if jokeid, err := strconv.Atoi(c.Param("jokeID")); err == nil {
-		// find joke, and increment likes
+		// find joke and increment likes
 		for i := 0; i < len(jokes); i++ {
 			if jokes[i].ID == jokeid {
-				jokes[i].Likes += 1
+				jokes[i].Likes = jokes[i].Likes + 1
 			}
 		}
-		// return a pointer to the updated jokes list
 		c.JSON(http.StatusOK, &jokes)
 	} else {
-		// Joke ID is invalid
+		// the jokes ID is invalid
 		c.AbortWithStatus(http.StatusNotFound)
 	}
 }
