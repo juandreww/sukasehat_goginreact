@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -8,9 +9,15 @@ import (
 	"os"
 	"strconv"
 
+	jwtmiddleware "github.com/auth0/go-jwt-middleware"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
+
+type Response struct {
+	Message string `json:"message"`
+}
 
 // Joke contains information about a single Joke
 type Joke struct {
@@ -33,6 +40,20 @@ var jokes = []Joke{
 
 func trace(s string)   { fmt.Println("entering:", s) }
 func untrace(s string) { fmt.Println("leaving:", s) }
+
+// Jwks stores a slice of JSON Web Keys
+type Jwks struct {
+	Keys []JSONWebKeys `json:"keys"`
+}
+
+type JSONWebKeys struct {
+	Kty string   `json:"kty"`
+	Kid string   `json:"kid"`
+	Use string   `json:"use"`
+	N   string   `json:"n"`
+	E   string   `json:"e"`
+	X5c []string `json:"x5c"`
+}
 
 var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
@@ -83,11 +104,40 @@ func main() {
 	// Our API will consit of just two routes
 	// /jokes - which will retrieve a list of jokes a user can see
 	// /jokes/like/:jokeID - which will capture likes sent to a particular joke
-	api.GET("/jokes", JokeHandler)
-	api.POST("/jokes/like/:jokeID", LikeJoke)
+	api.GET("/jokes", authMiddleware(), JokeHandler)
+	api.POST("/jokes/like/:jokeID", authMiddleware(), LikeJoke)
 
 	// Start and run the server
 	router.Run(":3000")
+}
+
+func getPemCert(token *jwt.Token) (string, error) {
+	cert := ""
+	resp, err := http.Get(os.Getenv("AUTH0_DOMAIN") + ".well-known/jwks.json")
+	if err != nil {
+		return cert, err
+	}
+	defer resp.Body.Close()
+
+	var jwks = Jwks{}
+	err = json.NewDecoder(resp.Body).Decode(&jwks)
+
+	if err != nil {
+		return cert, err
+	}
+
+	x5c := jwks.Keys[0].X5c
+	for k, v := range x5c {
+		if token.Header["kid"] == jwks.Keys[k].Kid {
+			cert = "-----BEGIN CERTIFICATE-----\n" + v + "\n-----END CERTIFICATE-----"
+		}
+	}
+
+	if cert == "" {
+		return cert, errors.New("unable to find appropriate key.")
+	}
+
+	return cert, nil
 }
 
 func authMiddleware() gin.HandlerFunc {
