@@ -1,7 +1,7 @@
 const AUTH0_CLIENT_ID = "olp0CzVY6mMGY0UWB6Ibwvv5vE8WSAQm";
 const AUTH0_DOMAIN = "dev-puaom9z0.us.auth0.com";
 const AUTH0_CALLBACK_URL = location.href;
-const AUTH0_API_AUDIENCE = "http://localhost:3000/";
+const AUTH0_API_AUDIENCE = "golang-gin";
 
 class App extends React.Component {
   parseHash() {
