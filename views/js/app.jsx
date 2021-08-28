@@ -2,6 +2,7 @@ const AUTH0_CLIENT_ID = "olp0CzVY6mMGY0UWB6Ibwvv5vE8WSAQm";
 const AUTH0_DOMAIN = "dev-puaom9z0.us.auth0.com";
 const AUTH0_CALLBACK_URL = location.href;
 const AUTH0_API_AUDIENCE = "golang-gin";
+import { Auth0Provider } from "@auth0/auth0-react"
 
 class App extends React.Component {
   parseHash() {
@@ -204,4 +205,12 @@ class Joke extends React.Component {
     );
   }
 }
-ReactDOM.render(<App />, document.getElementById("app"));
+
+ReactDOM.render(
+  <Auth0Provider
+    domain = {domain}
+    clientId = {clientId}
+    redirectUri = {windows.location.origin}>
+    <App />
+  </Auth0Provider>,
+document.getElementById("app"));
