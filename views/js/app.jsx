@@ -31,7 +31,7 @@ class App extends React.Component {
       }
     });
   }
-    
+
   setup() {
     $.ajaxSetup({
       beforeSend: (r) => {
@@ -44,6 +44,7 @@ class App extends React.Component {
       }
     });
   }
+
   setState() {
     let idToken = localStorage.getItem("id_token");
     if (idToken) {
@@ -52,13 +53,13 @@ class App extends React.Component {
       this.loggedIn = false;
     }
   }
-    
+
   componentWillMount() {
     this.setup();
     this.parseHash();
     this.setState();
   }
-    
+
   render() {
     if (this.loggedIn) {
       return <LoggedIn />;
@@ -83,7 +84,7 @@ class Home extends React.Component {
     });
     this.WebAuth.authorize();
   }
-    
+
   render() {
     return (
       <div className="container">
@@ -111,18 +112,18 @@ class LoggedIn extends React.Component {
     this.state = {
       jokes: []
     };
-    
+
     this.serverRequest = this.serverRequest.bind(this);
     this.logout = this.logout.bind(this);
   }
-  
+
   logout() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("access_token");
     localStorage.removeItem("profile");
     location.reload();
   }
-  
+
   serverRequest() {
     $.get("http://localhost:3000/api/jokes", res => {
       this.setState({
@@ -130,11 +131,11 @@ class LoggedIn extends React.Component {
       });
     });
   }
-  
+
   componentDidMount() {
     this.serverRequest();
   }
-  
+
   render() {
     return (
       <div className="container">
@@ -166,7 +167,7 @@ class Joke extends React.Component {
     this.like = this.like.bind(this);
     this.serverRequest = this.serverRequest.bind(this);
   }
-    
+
   like() {
     let joke = this.props.joke;
     this.serverRequest(joke);
@@ -182,7 +183,7 @@ class Joke extends React.Component {
       }
     );
   }
-    
+
   render() {
     return (
       <div className="col-xs-4">
@@ -191,7 +192,7 @@ class Joke extends React.Component {
             #{this.props.joke.id}{" "}
             <span className="pull-right">{this.state.liked}</span>
           </div>
-          <div className="panel-body">{this.props.joke.joke}</div>
+          <div className="panel-body joke-hld">{this.props.joke.joke}</div>
           <div className="panel-footer">
             {this.props.joke.likes} Likes &nbsp;
             <a onClick={this.like} className="btn btn-default">
@@ -200,6 +201,7 @@ class Joke extends React.Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
+ReactDOM.render(<App />, document.getElementById("app"));
