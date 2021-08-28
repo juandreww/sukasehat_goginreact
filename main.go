@@ -47,6 +47,11 @@ var jokes = []Joke{
 	Joke{5, 0, "I just watched a program about beavers. It was the best dam program I've ever seen."},
 	Joke{6, 0, "Why did the coffee file a police report? It got mugged."},
 	Joke{7, 0, "How does a penguin build it's house? Igloos it together."},
+	Joke{8, 0, "Dad, did you get a haircut? No I got them all cut."},
+	Joke{9, 0, "What do you call a Mexican who has lost his car? Carlos."},
+	Joke{10, 0, "Dad, can you put my shoes on? No, I don't think they'll fit me."},
+	Joke{11, 0, "Why did the scarecrow win an award? Because he was outstanding in his field."},
+	Joke{12, 0, "Why don't skeletons ever go trick or treating? Because they have no body to go with."},
 }
 
 var jwtMiddleWare *jwtmiddleware.JWTMiddleware
@@ -164,4 +169,14 @@ func LikeJoke(c *gin.Context) {
 		// the jokes ID is invalid
 		c.AbortWithStatus(http.StatusNotFound)
 	}
+}
+
+// getJokesByID returns a single joke
+func getJokesByID(id int) (*Joke, error) {
+	for _, joke := range jokes {
+		if joke.ID == id {
+			return &joke, nil
+		}
+	}
+	return nil, errors.New("Joke not found")
 }
