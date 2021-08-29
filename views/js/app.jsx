@@ -205,14 +205,4 @@ class Joke extends React.Component {
     );
   }
 }
-
 ReactDOM.render(<App />, document.getElementById("app"));
-
-// ReactDOM.render(
-//   <Auth0Provider
-//     domain = {domain}
-//     clientId = {clientId}
-//     redirectUri = {windows.location.origin}>
-//     <App />
-//   </Auth0Provider>,
-// document.getElementById("app"));
