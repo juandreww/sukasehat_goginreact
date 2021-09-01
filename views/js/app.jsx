@@ -13,7 +13,7 @@ class App extends React.Component {
     this.auth0.parseHash(window.location.hash, (err, authResult) => {
       if (err) {
         return console.log(err);
-      }
+      }//
       if (
         authResult !== null &&
         authResult.accessToken !== null &&
